@@ -187,9 +187,12 @@ public class UserServiceImp implements UserService {
 		multipart.addBodyPart(messageBodyPart);
 		MimeBodyPart attachPart = new MimeBodyPart();
 
-		attachPart.attachFile(Messages.ATTACHMENT_FILE_PATH);
-		multipart.addBodyPart(attachPart);
-		message.setContent(multipart);
+		if (Messages.ATTACHMENT_FILE_PATH != "" && Messages.ATTACHMENT_FILE_PATH != null) {
+			attachPart.attachFile(Messages.ATTACHMENT_FILE_PATH);
+			multipart.addBodyPart(attachPart);
+			message.setContent(multipart);
+		}
+
 		Transport.send(message);
 	}
 
