@@ -1,7 +1,11 @@
 package com.nagarro.nagptrackingsystem.services;
 
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 
 import org.springframework.stereotype.Service;
 
@@ -30,5 +34,7 @@ public interface UserService {
 	EnumSet<UserType> getUserTypes();
 
 	User applicantLogin(String email, String password);
+
+	void sendRegistrationEmail(int id) throws AddressException, MessagingException, IOException;
 
 }

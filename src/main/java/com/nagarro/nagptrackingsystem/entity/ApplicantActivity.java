@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -35,8 +37,9 @@ public class ApplicantActivity {
 
 	@ManyToOne(targetEntity = User.class)
 	@JoinColumn(name = "assignor", referencedColumnName = "user_id")
-	public User assignee;
+	public User assignor;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
 	public ActivityStatus activityStatus;
 
@@ -70,12 +73,12 @@ public class ApplicantActivity {
 	public ApplicantActivity() {
 	}
 
-	public ApplicantActivity(Applicant applicant, Activity activity, User assignee, ActivityStatus activityStatus,
+	public ApplicantActivity(Applicant applicant, Activity activity, User assignor, ActivityStatus activityStatus,
 			double percentage, double points, String description, byte[] document, Date startDate, Date endDate,
 			Date completionDate) {
 		this.applicant = applicant;
 		this.activity = activity;
-		this.assignee = assignee;
+		this.assignor = assignor;
 		this.activityStatus = activityStatus;
 		this.percentage = percentage;
 		this.points = points;
@@ -111,11 +114,11 @@ public class ApplicantActivity {
 	}
 
 	public User getAssignor() {
-		return assignee;
+		return assignor;
 	}
 
 	public void setAssignor(User assignor) {
-		this.assignee = assignor;
+		this.assignor = assignor;
 	}
 
 	public ActivityStatus getActivityStatus() {

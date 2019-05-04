@@ -16,6 +16,6 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Integer> {
 	public List<Applicant> findByNagpStatus(NAGPStatus nagpStatus);
 
 	@Modifying
-	@Query(value = "UPDATE user u, applicant a INNER JOIN a on a.applicant_id = u.applicant_id SET u.type = ?1, a.nagp_status = ?2, a.level_id = ?3, u.batch_id = ?4 WHERE u.user_id = ?5", nativeQuery = true)
-	public int updateApplicant(String type, String nagpStatus, int levelId, int batchId, int applicantId);
+	@Query(value = "UPDATE applicant SET nagp_status = ?1, level_id = ?2, batch_id = ?3 WHERE applicant_id = ?4", nativeQuery = true)
+	public int updateApplicant(String nagpStatus, int levelId, int batchId, int applicantId);
 }

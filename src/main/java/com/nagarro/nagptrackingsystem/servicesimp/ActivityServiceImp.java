@@ -10,7 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.nagarro.nagptrackingsystem.constant.ActivityStatus;
-import com.nagarro.nagptrackingsystem.constant.Message;
+import com.nagarro.nagptrackingsystem.constant.Messages;
 import com.nagarro.nagptrackingsystem.entity.Activity;
 import com.nagarro.nagptrackingsystem.exceptions.InvalidDataException;
 import com.nagarro.nagptrackingsystem.repositories.ActivityRepository;
@@ -37,9 +37,10 @@ public class ActivityServiceImp implements ActivityService {
 				batchRepository.findById(activity.getBatch().getBatchId()).get(),
 				levelRepository.findById(activity.getLevel().getLevelId()).get(), activity.getName());
 		if (checkActivity != null) {
-			throw new DataIntegrityViolationException(Message.ACTIVITY_EXISTS);
-		} else if (activity.getPoints() > activity.getLevel().getQualificationPoints()) {
-			throw new InvalidDataException(Message.ACTIVITY_PONTS_INVALID);
+			throw new DataIntegrityViolationException(Messages.ACTIVITY_EXISTS);
+		} else if (activity.getPoints() > levelRepository.findById(activity.getLevel().getLevelId()).get()
+				.getQualificationPoints()) {
+			throw new InvalidDataException(Messages.ACTIVITY_PONTS_INVALID);
 		} else {
 			Activity addedActivity = activityRepository.save(activity);
 			addedActivity.setBatch(batchRepository.findById(addedActivity.getBatch().getBatchId()).get());
@@ -77,7 +78,7 @@ public class ActivityServiceImp implements ActivityService {
 	@Transactional
 	public String deleteActivity(int id) {
 		activityRepository.deleteById(id);
-		return Message.DELETE_SUCCESS;
+		return Messages.DELETE_SUCCESS;
 	}
 
 	@Override
@@ -88,17 +89,18 @@ public class ActivityServiceImp implements ActivityService {
 
 	@Override
 	@Transactional
-	public Activity editActivity(Activity activity) throws InvalidDataException {
+	public Activity editActivity(int id, Activity activity) throws InvalidDataException {
 		Activity editedActivity;
-		if (activity.getPoints() > activity.getLevel().getQualificationPoints()) {
-			throw new InvalidDataException(Message.ACTIVITY_PONTS_INVALID);
+		if (activity.getPoints() > levelRepository.findById(activity.getLevel().getLevelId()).get()
+				.getQualificationPoints()) {
+			throw new InvalidDataException(Messages.ACTIVITY_PONTS_INVALID);
 		} else {
 			int affectedRows = activityRepository.editActivity(activity.getName(), activity.getDescription(),
-					activity.getMaxQualificationTimes(), activity.getActivityId());
+					activity.getMaxQualificationTimes(), id, activity.getPoints());
 			if (affectedRows == 1) {
-				editedActivity = activityRepository.findById(activity.getActivityId()).get();
+				editedActivity = activityRepository.findById(id).get();
 			} else {
-				throw new InvalidDataException(Message.UPDATE_ERROR);
+				throw new InvalidDataException(Messages.UPDATE_ERROR);
 			}
 		}
 		return editedActivity;

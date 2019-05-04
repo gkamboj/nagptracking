@@ -3,7 +3,6 @@ package com.nagarro.nagptrackingsystem.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -120,18 +119,6 @@ public class ApplicantController {
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Response response = new Response(commentService.getCommentById(id), "true");
 		return ResponseEntity.status(200).body(response);
-	}
-
-	@DeleteMapping("/comments/{id}")
-	public ResponseEntity<Response> deleteComment(@PathVariable("id") int id)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(commentService.deleteComment(id), "true");
-		return ResponseEntity.status(200).body(response);
-	}
-
-	@PutMapping("/comments/{id}")
-	public Response editComment(@PathVariable("id") int id, @RequestBody Comment comment) {
-		return null;
 	}
 
 	@PostMapping("/comments")

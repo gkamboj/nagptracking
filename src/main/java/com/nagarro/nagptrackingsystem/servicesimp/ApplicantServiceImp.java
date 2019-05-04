@@ -11,7 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.nagarro.nagptrackingsystem.constant.Message;
+import com.nagarro.nagptrackingsystem.constant.Messages;
 import com.nagarro.nagptrackingsystem.constant.NAGPStatus;
 import com.nagarro.nagptrackingsystem.constant.UserType;
 import com.nagarro.nagptrackingsystem.dto.Profile;
@@ -21,18 +21,23 @@ import com.nagarro.nagptrackingsystem.entity.Batch;
 import com.nagarro.nagptrackingsystem.entity.Level;
 import com.nagarro.nagptrackingsystem.entity.User;
 import com.nagarro.nagptrackingsystem.exceptions.InvalidDataException;
+import com.nagarro.nagptrackingsystem.repositories.ActivityRepository;
 import com.nagarro.nagptrackingsystem.repositories.ApplicantActivityRepository;
 import com.nagarro.nagptrackingsystem.repositories.ApplicantRepository;
 import com.nagarro.nagptrackingsystem.repositories.BatchRepository;
 import com.nagarro.nagptrackingsystem.repositories.LevelRepository;
 import com.nagarro.nagptrackingsystem.repositories.UserRepository;
 import com.nagarro.nagptrackingsystem.services.ApplicantService;
+import com.nagarro.nagptrackingsystem.services.UserService;
 
 @Service
 public class ApplicantServiceImp implements ApplicantService {
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	ActivityRepository activityRepository;
 
 	@Autowired
 	ApplicantRepository applicantRepository;
@@ -46,13 +51,16 @@ public class ApplicantServiceImp implements ApplicantService {
 	@Autowired
 	ApplicantActivityRepository applicantActivityRespository;
 
+	@Autowired
+	UserService userService;
+
 	@Override
 	// @Transactional
 	public Applicant addApplicant(Applicant applicant) {
 		if (!(userRepository.findFirstByEmail(applicant.getApplicant().getEmail()) == null)) {
-			throw new DataIntegrityViolationException(Message.APPLICANT_EMAIL_EXISTS);
+			throw new DataIntegrityViolationException(Messages.APPLICANT_EMAIL_EXISTS);
 		} else if (!(userRepository.findFirstByContactNo(applicant.getApplicant().getContactNo()) == null)) {
-			throw new DataIntegrityViolationException(Message.APPLICANT_CONTACT_EXISTS);
+			throw new DataIntegrityViolationException(Messages.APPLICANT_CONTACT_EXISTS);
 		} else {
 			User user = userRepository.save(applicant.getApplicant());
 			applicant.setId(user.getUserId());
@@ -72,9 +80,9 @@ public class ApplicantServiceImp implements ApplicantService {
 		if (userRepository.findFirstByContactNo(contactNo) != null
 				&& !(userRepository.findById(id).get().getContactNo().equals(contactNo))) {
 			if (userRepository.findById(id).get().getUserType() == UserType.admin) {
-				throw new DataIntegrityViolationException(Message.APPLICANT_CONTACT_EXISTS);
+				throw new DataIntegrityViolationException(Messages.APPLICANT_CONTACT_EXISTS);
 			} else {
-				throw new DataIntegrityViolationException(Message.USER_CONTACT_EXISTS);
+				throw new DataIntegrityViolationException(Messages.USER_CONTACT_EXISTS);
 			}
 		} else {
 			String dePassword = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -82,7 +90,7 @@ public class ApplicantServiceImp implements ApplicantService {
 			if (affectedRows == 1) {
 				applicant = applicantRepository.findById(id).get();
 			} else {
-				throw new InvalidDataException(Message.UPDATE_ERROR);
+				throw new InvalidDataException(Messages.UPDATE_ERROR);
 			}
 		}
 		return applicant;
@@ -92,12 +100,15 @@ public class ApplicantServiceImp implements ApplicantService {
 	@Transactional
 	public Applicant editApplicantByAdmin(int id, UserType userType, NAGPStatus nagpStatus, Level level, Batch batch)
 			throws InvalidDataException {
-		int affectedRows = applicantRepository.updateApplicant(String.valueOf(userType), String.valueOf(nagpStatus),
-				level.getLevelId(), batch.getBatchId(), id);
-		if (affectedRows == 1) {
+		User applicant = userRepository.findById(id).get();
+		int affectedRows = applicantRepository.updateApplicant(String.valueOf(nagpStatus), level.getLevelId(),
+				batch.getBatchId(), id);
+		int affectedUserRows = userRepository.updateUser(applicant.getPassword(), applicant.getName(),
+				applicant.getContactNo(), String.valueOf(userType), id);
+		if (affectedRows == 1 && affectedUserRows == 1) {
 			return applicantRepository.findById(id).get();
 		} else {
-			throw new InvalidDataException(Message.UPDATE_ERROR);
+			throw new InvalidDataException(Messages.UPDATE_ERROR);
 		}
 
 	}
@@ -132,7 +143,7 @@ public class ApplicantServiceImp implements ApplicantService {
 	@Transactional
 	public String deleteApplicant(int id) {
 		applicantRepository.deleteById(id);
-		return Message.DELETE_SUCCESS;
+		return Messages.DELETE_SUCCESS;
 
 	}
 
@@ -159,10 +170,11 @@ public class ApplicantServiceImp implements ApplicantService {
 	@Override
 	public double getAccumulatedPoints(int id) {
 		Applicant applicant = applicantRepository.findById(id).get();
-		List<ApplicantActivity> applicantList = applicantActivityRespository.findByApplicant(applicant);
+		List<ApplicantActivity> applicantActivityList = applicantActivityRespository.findByApplicant(applicant);
 		double accumulatedPoints = 0;
-		for (ApplicantActivity applicantActivity : applicantList) {
-			if (applicantActivity.getActivity().getLevel().getLevelId() == applicant.getLevel().getLevelId()) {
+		for (ApplicantActivity applicantActivity : applicantActivityList) {
+			if (activityRepository.findById(applicantActivity.getActivity().getActivityId()).get().getLevel()
+					.getLevelId() == applicant.getLevel().getLevelId()) {
 				accumulatedPoints += applicantActivity.getPoints();
 			}
 		}

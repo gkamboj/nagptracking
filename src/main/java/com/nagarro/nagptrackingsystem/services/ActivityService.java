@@ -21,7 +21,7 @@ public interface ActivityService {
 
 	public Activity getActivityById(int id);
 
-	public Activity editActivity(Activity activity) throws InvalidDataException;
+	public Activity editActivity(int id, Activity activity) throws InvalidDataException;
 
 	public EnumSet<ActivityStatus> getActivityStatus();
 

@@ -11,7 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.nagarro.nagptrackingsystem.constant.ActivityStatus;
-import com.nagarro.nagptrackingsystem.constant.Message;
+import com.nagarro.nagptrackingsystem.constant.Messages;
 import com.nagarro.nagptrackingsystem.entity.ApplicantActivity;
 import com.nagarro.nagptrackingsystem.entity.User;
 import com.nagarro.nagptrackingsystem.exceptions.InvalidDataException;
@@ -60,7 +60,7 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 	@Transactional
 	public String deleteApplicantActivity(int applicantActivityId) {
 		applicantActivityReository.deleteById(applicantActivityId);
-		return Message.DELETE_SUCCESS;
+		return Messages.DELETE_SUCCESS;
 	}
 
 	@Override
@@ -69,20 +69,23 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 		ApplicantActivity addedApplicantActivity;
 		if (applicantActivity.getEndDate() != null
 				&& applicantActivity.getStartDate().compareTo(applicantActivity.getEndDate()) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_START_END_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_START_END_DATE);
 		} else if (applicantActivity.getCompletionDate() != null
 				&& applicantActivity.getStartDate().compareTo(applicantActivity.getCompletionDate()) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_START_COMPLETION_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_START_COMPLETION_DATE);
 		} else if (applicantActivity.getCompletionDate() != null && applicantActivity.getEndDate() != null
 				&& applicantActivity.getCompletionDate().compareTo(applicantActivity.getEndDate()) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_COMPLETION_END_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_COMPLETION_END_DATE);
 		} else if (applicantActivityReository
 				.findByApplicantAndActivity(applicantActivity.getApplicant(), applicantActivity.getActivity())
-				.size() < applicantActivity.getActivity().getMaxQualificationTimes()) {
+				.size() < activityRepository.findById(applicantActivity.getActivity().getActivityId()).get()
+						.getMaxQualificationTimes()) {
 			applicantActivity.setPoints((new BigDecimal(
 					activityRepository.findById(applicantActivity.getActivity().getActivityId()).get().getPoints())
 							.multiply(new BigDecimal(applicantActivity.getPercentage())).divide(new BigDecimal(100)))
 									.doubleValue());
+//			applicantActivity.setActivityStatus(
+//					ActivityStatus.valueOf(String.valueOf(applicantActivity.getActivityStatus()).toUpperCase()));
 			addedApplicantActivity = applicantActivityReository.save(applicantActivity);
 			addedApplicantActivity
 					.setApplicant(applicantRepository.findById(addedApplicantActivity.getApplicant().getId()).get());
@@ -91,7 +94,7 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 
 			applicantService.updateApplicantLevel(applicantActivity.getApplicant().getId());
 		} else {
-			throw new DataIntegrityViolationException(Message.APPLICANT_ACTIVITY_LIMIT);
+			throw new DataIntegrityViolationException(Messages.APPLICANT_ACTIVITY_LIMIT);
 		}
 		return addedApplicantActivity;
 	}
@@ -103,11 +106,11 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 			throws InvalidDataException {
 		ApplicantActivity editedApplicantActivity;
 		if (endDate != null && startDate.compareTo(endDate) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_START_END_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_START_END_DATE);
 		} else if (completionDate != null && startDate.compareTo(completionDate) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_START_COMPLETION_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_START_COMPLETION_DATE);
 		} else if (completionDate != null && endDate != null && completionDate.compareTo(endDate) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_COMPLETION_END_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_COMPLETION_END_DATE);
 		} else {
 			int affectedRows = applicantActivityReository.updateApplicantActivity(id, String.valueOf(status),
 					completionDate, description, document, endDate, percentage, assignor.getUserId(), startDate);
@@ -116,7 +119,7 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 				applicantService
 						.updateApplicantLevel(applicantActivityReository.findById(id).get().getApplicant().getId());
 			} else {
-				throw new DataIntegrityViolationException(Message.UPDATE_ERROR);
+				throw new DataIntegrityViolationException(Messages.UPDATE_ERROR);
 			}
 		}
 		return editedApplicantActivity;
@@ -130,13 +133,13 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 		ApplicantActivity editedApplicantActivity;
 		ApplicantActivity applicantActivity = applicantActivityReository.findById(id).get();
 		if (endDate != null && startDate.compareTo(endDate) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_START_END_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_START_END_DATE);
 		} else if (applicantActivity.getCompletionDate() != null
 				&& startDate.compareTo(applicantActivity.getCompletionDate()) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_START_COMPLETION_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_START_COMPLETION_DATE);
 		} else if (applicantActivity.getCompletionDate() != null && endDate != null
 				&& applicantActivity.getCompletionDate().compareTo(endDate) > 0) {
-			throw new InvalidDataException(Message.APPLICANT_ACTIVITY_INVALID_COMPLETION_END_DATE);
+			throw new InvalidDataException(Messages.APPLICANT_ACTIVITY_INVALID_COMPLETION_END_DATE);
 		} else {
 			int affectedRows = applicantActivityReository.updateApplicantActivity(id,
 					String.valueOf(applicantActivity.getActivityStatus()), applicantActivity.getCompletionDate(),
@@ -146,7 +149,7 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 				applicantService
 						.updateApplicantLevel(applicantActivityReository.findById(id).get().getApplicant().getId());
 			} else {
-				throw new DataIntegrityViolationException(Message.UPDATE_ERROR);
+				throw new DataIntegrityViolationException(Messages.UPDATE_ERROR);
 			}
 		}
 		return editedApplicantActivity;

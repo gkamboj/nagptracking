@@ -21,6 +21,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Integer> {
 	public Activity findFirstByBatchAndLevelAndName(Batch batch, Level level, String name);
 
 	@Modifying
-	@Query(value = "UPDATE query SET name = ?1, description = ?2, max_qual_times = ?3 WHERE activity_id = ?4", nativeQuery = true)
-	public int editActivity(String name, String description, int maxQualtimes, int activityId);
+	@Query(value = "UPDATE activity SET name = ?1, description = ?2, max_qual_times = ?3, points = ?5 WHERE activity_id = ?4", nativeQuery = true)
+	public int editActivity(String name, String description, int maxQualtimes, int activityId, double points);
 }

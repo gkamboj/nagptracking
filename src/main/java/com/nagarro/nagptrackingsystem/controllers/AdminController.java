@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nagarro.nagptrackingsystem.constant.Messages;
 import com.nagarro.nagptrackingsystem.dto.LoginDetail;
 import com.nagarro.nagptrackingsystem.dto.Response;
 import com.nagarro.nagptrackingsystem.entity.Activity;
@@ -365,7 +366,7 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(activityService.editActivity(activity), "true");
+			response = new Response(activityService.editActivity(id, activity), "true");
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
 			response = new Response(ex.getMessage(), "false");
@@ -412,7 +413,7 @@ public class AdminController {
 	}
 
 	@PutMapping("/applicant/{id}")
-	public ResponseEntity<Response> editApplicantByAdmin(@PathVariable("id") int id, @RequestParam Applicant applicant)
+	public ResponseEntity<Response> editApplicantByAdmin(@PathVariable("id") int id, @RequestBody Applicant applicant)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Response response;
 		int status;
@@ -513,7 +514,7 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(applicantActivityService.getApplicantActivities(id), "true");
+			response = new Response(applicantActivityService.getApplicantActivityById(id), "true");
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
 			response = new Response(ex.getMessage(), "false");
@@ -581,4 +582,20 @@ public class AdminController {
 		return ResponseEntity.status(status).body(response);
 	}
 
+	// EMAIL
+	@PostMapping("/regemail/{id}")
+	public ResponseEntity<Response> sendRegistrationEmail(@PathVariable("id") int id)
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		Response response;
+		int status;
+		try {
+			adminService.sendRegistrationEmail(id);
+			response = new Response(Messages.REGISTER_EMAIL_SUCCESS, "true");
+			status = 200;
+		} catch (Exception ex) {
+			response = new Response(Messages.ERROR_EXCEPTION + ex.getMessage(), "false");
+			status = 409;
+		}
+		return ResponseEntity.status(status).body(response);
+	}
 }
