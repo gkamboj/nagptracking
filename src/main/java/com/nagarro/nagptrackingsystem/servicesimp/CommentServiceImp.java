@@ -1,5 +1,8 @@
 package com.nagarro.nagptrackingsystem.servicesimp;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -49,7 +52,9 @@ public class CommentServiceImp implements CommentService {
 
 	@Override
 	@Transactional
-	public Comment addComment(Comment comment) {
+	public Comment addComment(Comment comment) throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		comment.setTimestamp(sdf.parse(sdf.format(new Date())));
 		Comment addedComment = commentRepository.save(comment);
 		addedComment.setOwner(userRepository.findById(addedComment.getOwner().getUserId()).orElse(null));
 		return addedComment;

@@ -1,6 +1,7 @@
 package com.nagarro.nagptrackingsystem.controllers;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -572,7 +573,7 @@ public class AdminController {
 
 	@PostMapping("/comments")
 	public ResponseEntity<Response> addComment(@RequestBody Comment comment)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException, ParseException {
 		Response response;
 		int status;
 		try {

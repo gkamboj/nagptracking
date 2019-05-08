@@ -1,5 +1,7 @@
 package com.nagarro.nagptrackingsystem;
 
+import java.text.ParseException;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -8,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class NagpTrackingSystemApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParseException {
 		SpringApplication.run(NagpTrackingSystemApplication.class, args);
 	}
 
