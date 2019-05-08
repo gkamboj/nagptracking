@@ -1,5 +1,7 @@
 package com.nagarro.nagptrackingsystem.controllers;
 
+import java.text.ParseException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -122,7 +124,7 @@ public class ApplicantController {
 
 	@PostMapping("/comments")
 	public ResponseEntity<Response> addComment(@RequestBody Comment comment)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException, ParseException {
 		Response response = new Response(commentService.addComment(comment), "true");
 		return ResponseEntity.status(200).body(response);
 	}
