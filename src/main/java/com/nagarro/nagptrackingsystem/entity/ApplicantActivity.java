@@ -62,8 +62,8 @@ public class ApplicantActivity {
 
 	@Temporal(value = TemporalType.DATE)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-	@Column(name = "end_date")
-	public Date endDate;
+	@Column(name = "done_date")
+	public Date doneDate;
 
 	@Temporal(value = TemporalType.DATE)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -74,7 +74,7 @@ public class ApplicantActivity {
 	}
 
 	public ApplicantActivity(Applicant applicant, Activity activity, User assignor, ActivityStatus activityStatus,
-			double percentage, double points, String description, byte[] document, Date startDate, Date endDate,
+			double percentage, double points, String description, byte[] document, Date startDate, Date doneDate,
 			Date completionDate) {
 		this.applicant = applicant;
 		this.activity = activity;
@@ -85,7 +85,7 @@ public class ApplicantActivity {
 		this.description = description;
 		this.document = document;
 		this.startDate = startDate;
-		this.endDate = endDate;
+		this.doneDate = doneDate;
 		this.completionDate = completionDate;
 	}
 
@@ -161,12 +161,12 @@ public class ApplicantActivity {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
-		return endDate;
+	public Date getDoneDate() {
+		return doneDate;
 	}
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setDoneDate(Date doneDate) {
+		this.doneDate = doneDate;
 	}
 
 	public Date getCompletionDate() {

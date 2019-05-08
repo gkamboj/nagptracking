@@ -1,8 +1,12 @@
 package com.nagarro.nagptrackingsystem.servicesimp;
 
+import java.io.IOException;
+import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.List;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.transaction.Transactional;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -11,7 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.nagarro.nagptrackingsystem.constant.Messages;
+import com.nagarro.nagptrackingsystem.constant.Constants;
 import com.nagarro.nagptrackingsystem.constant.NAGPStatus;
 import com.nagarro.nagptrackingsystem.constant.UserType;
 import com.nagarro.nagptrackingsystem.dto.Profile;
@@ -56,11 +60,11 @@ public class ApplicantServiceImp implements ApplicantService {
 
 	@Override
 	// @Transactional
-	public Applicant addApplicant(Applicant applicant) {
+	public Applicant addApplicant(Applicant applicant) throws AddressException, MessagingException, IOException {
 		if (!(userRepository.findFirstByEmail(applicant.getApplicant().getEmail()) == null)) {
-			throw new DataIntegrityViolationException(Messages.APPLICANT_EMAIL_EXISTS);
+			throw new DataIntegrityViolationException(Constants.APPLICANT_EMAIL_EXISTS);
 		} else if (!(userRepository.findFirstByContactNo(applicant.getApplicant().getContactNo()) == null)) {
-			throw new DataIntegrityViolationException(Messages.APPLICANT_CONTACT_EXISTS);
+			throw new DataIntegrityViolationException(Constants.APPLICANT_CONTACT_EXISTS);
 		} else {
 			User user = userRepository.save(applicant.getApplicant());
 			applicant.setId(user.getUserId());
@@ -68,6 +72,7 @@ public class ApplicantServiceImp implements ApplicantService {
 			Applicant addedApplicant = applicantRepository.save(applicant);
 			addedApplicant.setBatch(batchRepository.findById(addedApplicant.getBatch().getBatchId()).get());
 			addedApplicant.setLevel(levelRepository.findById(addedApplicant.getLevel().getLevelId()).get());
+			userService.sendRegistrationEmail(addedApplicant.getId());
 			return addedApplicant;
 		}
 	}
@@ -80,9 +85,9 @@ public class ApplicantServiceImp implements ApplicantService {
 		if (userRepository.findFirstByContactNo(contactNo) != null
 				&& !(userRepository.findById(id).get().getContactNo().equals(contactNo))) {
 			if (userRepository.findById(id).get().getUserType() == UserType.admin) {
-				throw new DataIntegrityViolationException(Messages.APPLICANT_CONTACT_EXISTS);
+				throw new DataIntegrityViolationException(Constants.APPLICANT_CONTACT_EXISTS);
 			} else {
-				throw new DataIntegrityViolationException(Messages.USER_CONTACT_EXISTS);
+				throw new DataIntegrityViolationException(Constants.USER_CONTACT_EXISTS);
 			}
 		} else {
 			String dePassword = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -90,7 +95,7 @@ public class ApplicantServiceImp implements ApplicantService {
 			if (affectedRows == 1) {
 				applicant = applicantRepository.findById(id).get();
 			} else {
-				throw new InvalidDataException(Messages.UPDATE_ERROR);
+				throw new InvalidDataException(Constants.UPDATE_ERROR);
 			}
 		}
 		return applicant;
@@ -108,7 +113,7 @@ public class ApplicantServiceImp implements ApplicantService {
 		if (affectedRows == 1 && affectedUserRows == 1) {
 			return applicantRepository.findById(id).get();
 		} else {
-			throw new InvalidDataException(Messages.UPDATE_ERROR);
+			throw new InvalidDataException(Constants.UPDATE_ERROR);
 		}
 
 	}
@@ -143,7 +148,7 @@ public class ApplicantServiceImp implements ApplicantService {
 	@Transactional
 	public String deleteApplicant(int id) {
 		applicantRepository.deleteById(id);
-		return Messages.DELETE_SUCCESS;
+		return Constants.DELETE_SUCCESS;
 
 	}
 
@@ -168,14 +173,33 @@ public class ApplicantServiceImp implements ApplicantService {
 	}
 
 	@Override
-	public double getAccumulatedPoints(int id) {
-		Applicant applicant = applicantRepository.findById(id).get();
+	public double getAccumulatedPoints(int applicantId) {
+		Applicant applicant = applicantRepository.findById(applicantId).get();
 		List<ApplicantActivity> applicantActivityList = applicantActivityRespository.findByApplicant(applicant);
 		double accumulatedPoints = 0;
 		for (ApplicantActivity applicantActivity : applicantActivityList) {
 			if (activityRepository.findById(applicantActivity.getActivity().getActivityId()).get().getLevel()
 					.getLevelId() == applicant.getLevel().getLevelId()) {
 				accumulatedPoints += applicantActivity.getPoints();
+			}
+		}
+		return accumulatedPoints;
+	}
+
+	@Override
+	public double getAccumulatedPointsByMonth(int applicantId, int month) {
+		Applicant applicant = applicantRepository.findById(applicantId).get();
+		List<ApplicantActivity> applicantActivityList = applicantActivityRespository.findByApplicant(applicant);
+		double accumulatedPoints = 0;
+		for (ApplicantActivity applicantActivity : applicantActivityList) {
+			Calendar completionCal = Calendar.getInstance();
+			if (applicantActivity.getCompletionDate() != null) {
+				completionCal.setTime(applicantActivity.getCompletionDate());
+				if (activityRepository.findById(applicantActivity.getActivity().getActivityId()).get().getLevel()
+						.getLevelId() == applicant.getLevel().getLevelId()
+						&& completionCal.get(Calendar.MONTH) == month) {
+					accumulatedPoints += applicantActivity.getPoints();
+				}
 			}
 		}
 		return accumulatedPoints;

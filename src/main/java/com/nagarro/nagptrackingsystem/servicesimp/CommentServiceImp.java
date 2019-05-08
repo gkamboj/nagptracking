@@ -7,7 +7,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nagarro.nagptrackingsystem.constant.Messages;
+import com.nagarro.nagptrackingsystem.constant.Constants;
 import com.nagarro.nagptrackingsystem.entity.Comment;
 import com.nagarro.nagptrackingsystem.repositories.ApplicantActivityRepository;
 import com.nagarro.nagptrackingsystem.repositories.CommentRepository;
@@ -36,7 +36,7 @@ public class CommentServiceImp implements CommentService {
 	@Transactional
 	public String deleteComment(int id) {
 		commentRepository.deleteById(id);
-		return Messages.DELETE_SUCCESS;
+		return Constants.DELETE_SUCCESS;
 	}
 
 	@Override

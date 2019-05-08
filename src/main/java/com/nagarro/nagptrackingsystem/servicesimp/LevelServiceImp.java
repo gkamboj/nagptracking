@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import com.nagarro.nagptrackingsystem.constant.Messages;
+import com.nagarro.nagptrackingsystem.constant.Constants;
 import com.nagarro.nagptrackingsystem.entity.Level;
 import com.nagarro.nagptrackingsystem.exceptions.InvalidDataException;
 import com.nagarro.nagptrackingsystem.repositories.LevelRepository;
@@ -24,9 +24,9 @@ public class LevelServiceImp implements LevelService {
 	@Transactional
 	public Level addLevel(Level level) {
 		if (levelRepository.findFirstByName(level.getName()) != null) {
-			throw new DataIntegrityViolationException(Messages.LEVEL_NAME_EXISTS);
+			throw new DataIntegrityViolationException(Constants.LEVEL_NAME_EXISTS);
 		} else if (levelRepository.findFirstByNumber(level.getNumber()) != null) {
-			throw new DataIntegrityViolationException(Messages.LEVEL_NUMBER_EXISTS);
+			throw new DataIntegrityViolationException(Constants.LEVEL_NUMBER_EXISTS);
 		} else {
 			return levelRepository.save(level);
 		}
@@ -49,7 +49,7 @@ public class LevelServiceImp implements LevelService {
 	@Transactional
 	public String deleteLevel(int id) {
 		levelRepository.deleteById(id);
-		return Messages.DELETE_SUCCESS;
+		return Constants.DELETE_SUCCESS;
 	}
 
 	@Override
@@ -58,13 +58,13 @@ public class LevelServiceImp implements LevelService {
 			throws InvalidDataException {
 		Level level;
 		if (!(getLevelById(id).getName().equals(name)) && levelRepository.findFirstByName(name) != null) {
-			throw new DataIntegrityViolationException(Messages.LEVEL_NAME_EXISTS);
+			throw new DataIntegrityViolationException(Constants.LEVEL_NAME_EXISTS);
 		} else {
 			int affectedRows = levelRepository.editLevel(name, description, qualificationPoints, id);
 			if (affectedRows == 1) {
 				level = levelRepository.findById(id).get();
 			} else {
-				throw new InvalidDataException(Messages.UPDATE_ERROR);
+				throw new InvalidDataException(Constants.UPDATE_ERROR);
 			}
 		}
 		return level;

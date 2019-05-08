@@ -10,6 +10,7 @@ import javax.mail.internet.AddressException;
 import org.springframework.stereotype.Service;
 
 import com.nagarro.nagptrackingsystem.constant.UserType;
+import com.nagarro.nagptrackingsystem.dto.ReportDTO;
 import com.nagarro.nagptrackingsystem.entity.User;
 import com.nagarro.nagptrackingsystem.exceptions.InvalidDataException;
 
@@ -35,6 +36,20 @@ public interface UserService {
 
 	User applicantLogin(String email, String password);
 
-	void sendRegistrationEmail(int id) throws AddressException, MessagingException, IOException;
+	void sendRegistrationEmail(int applicantId) throws AddressException, MessagingException, IOException;
+
+	List<ReportDTO> getBatchReport(int batchId);
+
+	void createCsv() throws IOException;
+
+	String getApplicantReport(int applicantId);
+
+	void sendApplicantMonthlyReportEmail();
+
+	String getAdminEmails();
+
+	void sendBatchSummaryEmail();
+
+	void cretaeSummaryZip() throws IOException;
 
 }

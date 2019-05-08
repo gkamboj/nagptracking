@@ -1,7 +1,11 @@
 package com.nagarro.nagptrackingsystem.controllers;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nagarro.nagptrackingsystem.constant.Messages;
+import com.nagarro.nagptrackingsystem.constant.Constants;
 import com.nagarro.nagptrackingsystem.dto.LoginDetail;
 import com.nagarro.nagptrackingsystem.dto.Response;
 import com.nagarro.nagptrackingsystem.entity.Activity;
@@ -377,8 +381,8 @@ public class AdminController {
 
 	// APPLICANT
 	@PostMapping("/applicant")
-	public ResponseEntity<Response> addApplicant(@RequestBody Applicant applicant)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public ResponseEntity<Response> addApplicant(@RequestBody Applicant applicant) throws InstantiationException,
+			IllegalAccessException, ClassNotFoundException, AddressException, MessagingException, IOException {
 		Response response;
 		int status;
 		try {
@@ -489,9 +493,8 @@ public class AdminController {
 		int status;
 		try {
 			response = new Response(applicantActivityService.editApplicantActivityByAdmin(id,
-					applicantActivity.getActivityStatus(), applicantActivity.getCompletionDate(),
-					applicantActivity.getDescription(), applicantActivity.getDocument(), applicantActivity.getEndDate(),
-					applicantActivity.getPercentage(), applicantActivity.getAssignor(),
+					applicantActivity.getActivityStatus(), applicantActivity.getDescription(),
+					applicantActivity.getDocument(), applicantActivity.getPercentage(), applicantActivity.getAssignor(),
 					applicantActivity.getStartDate()), "true");
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
@@ -583,19 +586,52 @@ public class AdminController {
 	}
 
 	// EMAIL
-	@PostMapping("/regemail/{id}")
+	@PostMapping("/email/registration/{id}")
 	public ResponseEntity<Response> sendRegistrationEmail(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Response response;
 		int status;
 		try {
 			adminService.sendRegistrationEmail(id);
-			response = new Response(Messages.REGISTER_EMAIL_SUCCESS, "true");
+			response = new Response(Constants.EMAIL_APPLICANT_REGISTER_SUCCESS, "true");
 			status = 200;
 		} catch (Exception ex) {
-			response = new Response(Messages.ERROR_EXCEPTION + ex.getMessage(), "false");
+			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), "false");
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
 	}
+
+	@PostMapping("email/summary")
+	public ResponseEntity<Response> sendMontlySummary()
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		Response response;
+		int status;
+		try {
+			adminService.sendBatchSummaryEmail();
+			response = new Response(Constants.EMAIL_BATCH_SUMMARY_SUCCESS, "true");
+			status = 200;
+		} catch (Exception ex) {
+			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), "false");
+			status = 409;
+		}
+		return ResponseEntity.status(status).body(response);
+	}
+
+	@PostMapping("email/applicant_report")
+	public ResponseEntity<Response> sendApplicantReport()
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		Response response;
+		int status;
+		try {
+			adminService.sendBatchSummaryEmail();
+			response = new Response(Constants.EMAIL_APPLICANT_REPORT_SUCCESS, "true");
+			status = 200;
+		} catch (Exception ex) {
+			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), "false");
+			status = 409;
+		}
+		return ResponseEntity.status(status).body(response);
+	}
+
 }

@@ -9,11 +9,14 @@ import org.springframework.stereotype.Repository;
 
 import com.nagarro.nagptrackingsystem.constant.NAGPStatus;
 import com.nagarro.nagptrackingsystem.entity.Applicant;
+import com.nagarro.nagptrackingsystem.entity.Batch;
 
 @Repository
 public interface ApplicantRepository extends JpaRepository<Applicant, Integer> {
 
 	public List<Applicant> findByNagpStatus(NAGPStatus nagpStatus);
+
+	public List<Applicant> findByBatch(Batch batch);
 
 	@Modifying
 	@Query(value = "UPDATE applicant SET nagp_status = ?1, level_id = ?2, batch_id = ?3 WHERE applicant_id = ?4", nativeQuery = true)

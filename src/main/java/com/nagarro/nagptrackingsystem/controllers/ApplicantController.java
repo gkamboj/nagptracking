@@ -79,9 +79,8 @@ public class ApplicantController {
 		int status;
 		try {
 			response = new Response(applicantActivityService.editApplicantActivityByApplicant(id,
-					applicantActivity.getDescription(), applicantActivity.getDocument(), applicantActivity.getEndDate(),
-					applicantActivity.getPercentage(), applicantActivity.getAssignor(),
-					applicantActivity.getStartDate()), "true");
+					applicantActivity.getActivityStatus(), applicantActivity.getDescription(),
+					applicantActivity.getDocument(), applicantActivity.getAssignor()), "true");
 			status = 200;
 		} catch (InvalidDataException ex) {
 			response = new Response(ex.getMessage(), "false");

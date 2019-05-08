@@ -1,7 +1,11 @@
 package com.nagarro.nagptrackingsystem.services;
 
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 
 import com.nagarro.nagptrackingsystem.constant.NAGPStatus;
 import com.nagarro.nagptrackingsystem.constant.UserType;
@@ -13,7 +17,7 @@ import com.nagarro.nagptrackingsystem.exceptions.InvalidDataException;
 
 public interface ApplicantService {
 
-	Applicant addApplicant(Applicant applicant);
+	Applicant addApplicant(Applicant applicant) throws AddressException, MessagingException, IOException;
 
 	public Applicant editApplicantByApplicant(int id, String password, String name, String contactNo)
 			throws InvalidDataException;
@@ -36,4 +40,6 @@ public interface ApplicantService {
 	void updateApplicantLevel(int applicantId);
 
 	double getAccumulatedPoints(int id);
+
+	double getAccumulatedPointsByMonth(int id, int month);
 }
