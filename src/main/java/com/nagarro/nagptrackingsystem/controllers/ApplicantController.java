@@ -124,7 +124,7 @@ public class ApplicantController {
 
 	@PostMapping("/comments")
 	public ResponseEntity<Response> addComment(@RequestBody Comment comment)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException, ParseException {
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Response response = new Response(commentService.addComment(comment), "true");
 		return ResponseEntity.status(200).body(response);
 	}
