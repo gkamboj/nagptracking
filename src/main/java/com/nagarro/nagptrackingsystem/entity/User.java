@@ -13,6 +13,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.nagarro.nagptrackingsystem.constant.Constants;
 import com.nagarro.nagptrackingsystem.constant.UserType;
 
 @Entity
@@ -46,7 +47,7 @@ public class User {
 
 	public User(String name, String password, String email, String contactNo, UserType userType) {
 		this.name = name;
-		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+		this.password = BCrypt.hashpw(password, Constants.BCRYPT_SALT);
 		this.email = email;
 		this.contactNo = contactNo;
 		this.userType = userType;
@@ -73,7 +74,7 @@ public class User {
 	}
 
 	public void setPassword(String password) {
-		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+		this.password = BCrypt.hashpw(password, Constants.BCRYPT_SALT);
 	}
 
 	public String getEmail() {

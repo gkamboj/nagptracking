@@ -66,11 +66,14 @@ public class AdminController {
 	@Autowired
 	ApplicantActivityService applicantActivityService;
 
+	String success = "true";
+	String failure = "false";
+
 	// ADMIN
 	@GetMapping
 	public ResponseEntity<Response> getAdmins()
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(adminService.findAdmins(), "true");
+		Response response = new Response(adminService.findAdmins(), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -80,10 +83,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(adminService.adminById(id), "true");
+			response = new Response(adminService.adminById(id), success);
 			status = 200;
 		} catch (NoSuchElementException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -95,10 +98,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(adminService.addAdmin(user), "true");
+			response = new Response(adminService.addAdmin(user), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -111,10 +114,10 @@ public class AdminController {
 		int status;
 		try {
 			response = new Response(adminService.adminLogin(loginDetails.getEmail(), loginDetails.getPassword()),
-					"true");
+					success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -123,7 +126,7 @@ public class AdminController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Response> deleteUser(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(adminService.deleteUser(id), "true");
+		Response response = new Response(adminService.deleteUser(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -134,10 +137,10 @@ public class AdminController {
 		int status;
 		try {
 			response = new Response(adminService.updateAdmin(id, user.getPassword(), user.getName(),
-					user.getContactNo(), user.getUserType()), "true");
+					user.getContactNo(), user.getUserType()), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -150,10 +153,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(levelService.getLevels(), "true");
+			response = new Response(levelService.getLevels(), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -165,10 +168,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(levelService.addLevel(level), "true");
+			response = new Response(levelService.addLevel(level), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -180,10 +183,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(levelService.getLevelById(id), "true");
+			response = new Response(levelService.getLevelById(id), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -192,7 +195,7 @@ public class AdminController {
 	@DeleteMapping("/level/{id}")
 	public ResponseEntity<Response> deleteLevel(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(levelService.deleteLevel(id), "true");
+		Response response = new Response(levelService.deleteLevel(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -204,10 +207,10 @@ public class AdminController {
 		try {
 			response = new Response(
 					levelService.editLevel(id, level.getName(), level.getDescription(), level.getQualificationPoints()),
-					"true");
+					success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -220,10 +223,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(batchService.getBatches(), "true");
+			response = new Response(batchService.getBatches(), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -235,10 +238,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(batchService.addBatch(batch), "true");
+			response = new Response(batchService.addBatch(batch), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -250,10 +253,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(batchService.getBatchById(id), "true");
+			response = new Response(batchService.getBatchById(id), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -262,7 +265,7 @@ public class AdminController {
 	@DeleteMapping("/batch/{id}")
 	public ResponseEntity<Response> deleteBatch(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(batchService.deleteBatch(id), "true");
+		Response response = new Response(batchService.deleteBatch(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -273,10 +276,10 @@ public class AdminController {
 		int status;
 		try {
 			response = new Response(batchService.editBtach(id, batch.getBatchTechnology(), batch.getDescription(),
-					batch.getStartDate(), batch.getYear()), "true");
+					batch.getStartDate(), batch.getYear()), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -289,10 +292,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(activityService.addActivity(activity), "true");
+			response = new Response(activityService.addActivity(activity), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -304,10 +307,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(activityService.getActivities(), "true");
+			response = new Response(activityService.getActivities(), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -319,10 +322,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(activityService.getActivityById(id), "true");
+			response = new Response(activityService.getActivityById(id), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -334,10 +337,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(activityService.getActivityByLevel(levelId), "true");
+			response = new Response(activityService.getActivityByLevel(levelId), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -349,10 +352,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(activityService.getActivityByBatch(batchId), "true");
+			response = new Response(activityService.getActivityByBatch(batchId), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -361,7 +364,7 @@ public class AdminController {
 	@DeleteMapping("/activity/{id}")
 	public ResponseEntity<Response> deleteActivity(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(activityService.deleteActivity(id), "true");
+		Response response = new Response(activityService.deleteActivity(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -371,10 +374,25 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(activityService.editActivity(id, activity), "true");
+			response = new Response(activityService.editActivity(id, activity), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
+			status = 409;
+		}
+		return ResponseEntity.status(status).body(response);
+	}
+
+	@GetMapping("activity/eligible/{id}")
+	public ResponseEntity<Response> getApplicantEligiblleActivities(@PathVariable("id") int applicantId)
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+		Response response;
+		int status;
+		try {
+			response = new Response(activityService.getApplicantEligibleActivities(applicantId), success);
+			status = 200;
+		} catch (Exception ex) {
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -387,10 +405,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(applicantService.addApplicant(applicant), "true");
+			response = new Response(applicantService.addApplicant(applicant), success);
 			status = 200;
-		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+		} catch (DataIntegrityViolationException | InvalidDataException ex) {
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -405,13 +423,13 @@ public class AdminController {
 		try {
 			status = 200;
 			if (pageNo.isPresent() && pageSize.isPresent()) {
-				response = new Response(applicantService.getApplicantsPaginated(pageNo.get(), pageSize.get()), "true");
+				response = new Response(applicantService.getApplicantsPaginated(pageNo.get(), pageSize.get()), success);
 			} else {
-				response = new Response(applicantService.getAllApplicants(), "true");
+				response = new Response(applicantService.getAllApplicants(), success);
 			}
 		} catch (DataIntegrityViolationException ex) {
 			status = 409;
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 		}
 		return ResponseEntity.status(status).body(response);
 
@@ -424,10 +442,10 @@ public class AdminController {
 		int status;
 		try {
 			response = new Response(applicantService.editApplicantByAdmin(id, applicant.getApplicant().getUserType(),
-					applicant.getNagpStatus(), applicant.getLevel(), applicant.getBatch()), "true");
+					applicant.getNagpStatus(), applicant.getLevel(), applicant.getBatch()), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -439,10 +457,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(applicantService.getApplicantById(id), "true");
+			response = new Response(applicantService.getApplicantById(id), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -451,7 +469,7 @@ public class AdminController {
 	@DeleteMapping("/applicant/{id}")
 	public ResponseEntity<Response> deleteApplicant(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(applicantService.deleteApplicant(id), "true");
+		Response response = new Response(applicantService.deleteApplicant(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -461,10 +479,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(applicantActivityService.getApplicantActivities(id), "true");
+			response = new Response(applicantActivityService.getApplicantActivities(id), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -477,10 +495,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(applicantActivityService.addApplicantActivity(applicantActivity), "true");
+			response = new Response(applicantActivityService.addApplicantActivity(applicantActivity), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -496,10 +514,10 @@ public class AdminController {
 			response = new Response(applicantActivityService.editApplicantActivityByAdmin(id,
 					applicantActivity.getActivityStatus(), applicantActivity.getDescription(),
 					applicantActivity.getDocument(), applicantActivity.getPercentage(), applicantActivity.getAssignor(),
-					applicantActivity.getStartDate()), "true");
+					applicantActivity.getStartDate()), success);
 			status = 200;
 		} catch (DataIntegrityViolationException | InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -508,7 +526,7 @@ public class AdminController {
 	@DeleteMapping("/applicant_activity/{id}")
 	public ResponseEntity<Response> deleteApplicantActivity(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(applicantActivityService.deleteApplicantActivity(id), "true");
+		Response response = new Response(applicantActivityService.deleteApplicantActivity(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -518,10 +536,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(applicantActivityService.getApplicantActivityById(id), "true");
+			response = new Response(applicantActivityService.getApplicantActivityById(id), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -533,10 +551,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(commentService.getCommentsByApplicantActivityId(id), "true");
+			response = new Response(commentService.getCommentsByApplicantActivityId(id), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -549,10 +567,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(commentService.getCommentById(id), "true");
+			response = new Response(commentService.getCommentById(id), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -561,7 +579,7 @@ public class AdminController {
 	@DeleteMapping("/comments/{id}")
 	public ResponseEntity<Response> deleteComment(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(commentService.deleteComment(id), "true");
+		Response response = new Response(commentService.deleteComment(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -577,10 +595,10 @@ public class AdminController {
 		Response response;
 		int status;
 		try {
-			response = new Response(commentService.addComment(comment), "true");
+			response = new Response(commentService.addComment(comment), success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -594,10 +612,10 @@ public class AdminController {
 		int status;
 		try {
 			adminService.sendRegistrationEmail(id);
-			response = new Response(Constants.EMAIL_APPLICANT_REGISTER_SUCCESS, "true");
+			response = new Response(Constants.EMAIL_APPLICANT_REGISTER_SUCCESS, success);
 			status = 200;
 		} catch (Exception ex) {
-			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), "false");
+			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -610,10 +628,10 @@ public class AdminController {
 		int status;
 		try {
 			adminService.sendBatchSummaryEmail();
-			response = new Response(Constants.EMAIL_BATCH_SUMMARY_SUCCESS, "true");
+			response = new Response(Constants.EMAIL_BATCH_SUMMARY_SUCCESS, success);
 			status = 200;
 		} catch (Exception ex) {
-			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), "false");
+			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -626,10 +644,10 @@ public class AdminController {
 		int status;
 		try {
 			adminService.sendBatchSummaryEmail();
-			response = new Response(Constants.EMAIL_APPLICANT_REPORT_SUCCESS, "true");
+			response = new Response(Constants.EMAIL_APPLICANT_REPORT_SUCCESS, success);
 			status = 200;
 		} catch (Exception ex) {
-			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), "false");
+			response = new Response(Constants.ERROR_EXCEPTION + ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);

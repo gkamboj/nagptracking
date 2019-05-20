@@ -83,9 +83,14 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 				.findByApplicantAndActivity(applicantActivity.getApplicant(), applicantActivity.getActivity())
 				.size() < activityRepository.findById(applicantActivity.getActivity().getActivityId()).get()
 						.getMaxQualificationTimes()) {
+			DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT);
+			Date startDate = new Date();
+			dateFormat.format(startDate);
+			applicantActivity.setStartDate(startDate);
 			applicantActivity.setPoints(getPointsFromPercentage(
 					activityRepository.findById(applicantActivity.getActivity().getActivityId()).get().getPoints(),
 					applicantActivity.getPercentage()));
+
 			addedApplicantActivity = applicantActivityReository.save(applicantActivity);
 			addedApplicantActivity
 					.setApplicant(applicantRepository.findById(addedApplicantActivity.getApplicant().getId()).get());
@@ -119,6 +124,9 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 		double points = getPointsFromPercentage(
 				activityRepository.findById(applicantActivity.getActivity().getActivityId()).get().getPoints(),
 				percentage);
+		if (percentage > 100 || percentage < 0) {
+			throw new InvalidDataException(Constants.INVALID_PERCENTAGE);
+		}
 		if (String.valueOf(status).equals("COMPLETED") && applicantActivity.getDoneDate() != null) {
 			completionDate = date;
 		}
@@ -138,7 +146,7 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 	@Override
 	@Transactional
 	public ApplicantActivity editApplicantActivityByApplicant(int id, ActivityStatus activityStatus, String description,
-			byte[] document, User assignor) throws InvalidDataException {
+			byte[] document) throws InvalidDataException {
 
 		ApplicantActivity editedApplicantActivity;
 		ApplicantActivity applicantActivity = applicantActivityReository.findById(id).get();
@@ -149,10 +157,11 @@ public class ApplicantActivityServiceImp implements ApplicantActivityService {
 		if (String.valueOf(activityStatus).equals("DONE")) {
 			doneDate = date;
 		}
+
 		int affectedRows = applicantActivityReository.updateApplicantActivity(id,
 				String.valueOf(applicantActivity.getActivityStatus()), applicantActivity.getCompletionDate(),
 				description, document, doneDate, applicantActivity.getPercentage(), applicantActivity.getPoints(),
-				assignor.getUserId(), applicantActivity.getStartDate());
+				applicantActivity.getAssignor().getUserId(), applicantActivity.getStartDate());
 		if (affectedRows == 1) {
 			editedApplicantActivity = applicantActivityReository.findById(id).get();
 			applicantService.updateApplicantLevel(applicantActivityReository.findById(id).get().getApplicant().getId());

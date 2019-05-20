@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -101,7 +102,10 @@ public class UserServiceImp implements UserService {
 	@Transactional
 	public User addAdmin(User user) throws InvalidDataException {
 		User addedUser;
-		if (!(user.getContactNo().matches("^[6-9]\\d{9}$"))) {
+		if (!(Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE)
+				.matcher(user.getEmail()).find())) {
+			throw new InvalidDataException(Constants.EMAIL_INVALID);
+		} else if (!(user.getContactNo().matches("^[6-9]\\d{9}$"))) {
 			throw new InvalidDataException(Constants.CONTACT_INVALID);
 		} else if (!(userRepository.findFirstByEmail(user.getEmail()) == null)) {
 			throw new DataIntegrityViolationException(Constants.ADMIN_EMAIL_EXISTS);
@@ -133,7 +137,7 @@ public class UserServiceImp implements UserService {
 	public User applicantLogin(String email, String password) {
 		User user = userRepository.findFirstByEmail(email);
 		if ((user != null && user.getUserType() == UserType.admin) || user == null) {
-			throw new DataIntegrityViolationException(Constants.ADMIN_INVALID_EMAIL);
+			throw new DataIntegrityViolationException(Constants.APPLICANT_INVALID_EMAIL);
 		} else {
 			if (BCrypt.checkpw(password, user.getPassword())) {
 				return user;
@@ -165,7 +169,7 @@ public class UserServiceImp implements UserService {
 				throw new DataIntegrityViolationException(Constants.USER_CONTACT_EXISTS);
 			}
 		} else {
-			String dePassword = BCrypt.hashpw(password, BCrypt.gensalt());
+			String dePassword = BCrypt.hashpw(password, Constants.BCRYPT_SALT);
 			int affectedRows = userRepository.updateUser(dePassword, name, contactNo, String.valueOf(userType), id);
 			if (affectedRows == 1) {
 				admin = userRepository.findById(id).get();
@@ -174,6 +178,11 @@ public class UserServiceImp implements UserService {
 			}
 		}
 		return admin;
+//		User admin = userRepository.findById(id).get();
+//		admin.setPassword(password);
+//		admin.setContactNo(contactNo);
+//		userRepository.save(admin);
+//		return admin;
 	}
 
 	@Override

@@ -25,4 +25,6 @@ public interface ActivityService {
 
 	public EnumSet<ActivityStatus> getActivityStatus();
 
+	public List<Activity> getApplicantEligibleActivities(int applicantId);
+
 }

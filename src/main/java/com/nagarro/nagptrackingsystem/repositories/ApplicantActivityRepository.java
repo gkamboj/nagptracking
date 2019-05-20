@@ -23,7 +23,7 @@ public interface ApplicantActivityRepository extends JpaRepository<ApplicantActi
 	public List<ApplicantActivity> findByActivityStatusAndApplicant(ActivityStatus activityStatus, Applicant applicant);
 
 	@Modifying
-	@Query(value = "UPDATE applicant_activity SET  status = ?2, completion_date = ?3, description = ?4, document = ?5, end_date = ?6, percentage = ?7, points = ?8, assignor = ?9, start_date = ?10 WHERE applicant_activity_id = ?1", nativeQuery = true)
+	@Query(value = "UPDATE applicant_activity SET  status = ?2, completion_date = ?3, description = ?4, document = ?5, done_date = ?6, percentage = ?7, points = ?8, assignor = ?9, start_date = ?10 WHERE applicant_activity_id = ?1", nativeQuery = true)
 	public int updateApplicantActivity(int id, String status, Date completionDate, String description, byte[] document,
 			Date doneDate, double percentage, double points, int assignorId, Date startDate);
 

@@ -2,6 +2,7 @@ package com.nagarro.nagptrackingsystem.controllers;
 
 import java.text.ParseException;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,9 @@ public class ApplicantController {
 	@Autowired
 	CommentService commentService;
 
+	String success = "true";
+	String failure = "false";
+
 	@PutMapping("/{id}")
 	public ResponseEntity<Response> editApplicantByApplicant(@PathVariable("id") int id,
 			@RequestBody Applicant applicant)
@@ -50,10 +54,10 @@ public class ApplicantController {
 			response = new Response(
 					applicantService.editApplicantByApplicant(id, applicant.getApplicant().getPassword(),
 							applicant.getApplicant().getName(), applicant.getApplicant().getContactNo()),
-					"true");
+					success);
 			status = 200;
 		} catch (InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -62,14 +66,14 @@ public class ApplicantController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Response> getApplicantById(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(applicantService.getApplicantById(id), "true");
+		Response response = new Response(applicantService.getApplicantById(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
 	@GetMapping("/{id}/profile")
 	public ResponseEntity<Response> getApplicantProfile(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(applicantService.getProfile(id), "true");
+		Response response = new Response(applicantService.getProfile(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -80,12 +84,13 @@ public class ApplicantController {
 		Response response;
 		int status;
 		try {
-			response = new Response(applicantActivityService.editApplicantActivityByApplicant(id,
-					applicantActivity.getActivityStatus(), applicantActivity.getDescription(),
-					applicantActivity.getDocument(), applicantActivity.getAssignor()), "true");
+			response = new Response(
+					applicantActivityService.editApplicantActivityByApplicant(id, applicantActivity.getActivityStatus(),
+							applicantActivity.getDescription(), applicantActivity.getDocument()),
+					success);
 			status = 200;
 		} catch (InvalidDataException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -94,7 +99,7 @@ public class ApplicantController {
 	@GetMapping("/{id}/applicant_activity")
 	public ResponseEntity<Response> getApplicantActivitiesByApplicantId(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(applicantActivityService.getApplicantActivities(id), "true");
+		Response response = new Response(applicantActivityService.getApplicantActivities(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
@@ -103,12 +108,16 @@ public class ApplicantController {
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Response response;
 		int status;
+		System.out.println(loginDetails.getPassword());
+		System.out.println(BCrypt.checkpw(loginDetails.getPassword(),
+				"$2a$10$k5ZFPkjRieok6wm8SpxwK.jx/vEKeTcu2aBksW.1lbTAEx2argryK"));
+		System.out.println("$2a$10$k5ZFPkjRieok6wm8SpxwK.jx/vEKeTcu2aBksW.1lbTAEx2argryK".length());
 		try {
 			response = new Response(userService.applicantLogin(loginDetails.getEmail(), loginDetails.getPassword()),
-					"true");
+					success);
 			status = 200;
 		} catch (DataIntegrityViolationException ex) {
-			response = new Response(ex.getMessage(), "false");
+			response = new Response(ex.getMessage(), failure);
 			status = 409;
 		}
 		return ResponseEntity.status(status).body(response);
@@ -118,14 +127,14 @@ public class ApplicantController {
 	@GetMapping("/comments/{id}")
 	public ResponseEntity<Response> getCommentByCommentId(@PathVariable("id") int id)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Response response = new Response(commentService.getCommentById(id), "true");
+		Response response = new Response(commentService.getCommentById(id), success);
 		return ResponseEntity.status(200).body(response);
 	}
 
 	@PostMapping("/comments")
 	public ResponseEntity<Response> addComment(@RequestBody Comment comment)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, ParseException {
-		Response response = new Response(commentService.addComment(comment), "true");
+		Response response = new Response(commentService.addComment(comment), success);
 		return ResponseEntity.status(200).body(response);
 	}
 

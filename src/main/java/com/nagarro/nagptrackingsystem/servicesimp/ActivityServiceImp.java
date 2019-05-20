@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import com.nagarro.nagptrackingsystem.constant.ActivityStatus;
 import com.nagarro.nagptrackingsystem.constant.Constants;
 import com.nagarro.nagptrackingsystem.entity.Activity;
+import com.nagarro.nagptrackingsystem.entity.Applicant;
 import com.nagarro.nagptrackingsystem.exceptions.InvalidDataException;
 import com.nagarro.nagptrackingsystem.repositories.ActivityRepository;
+import com.nagarro.nagptrackingsystem.repositories.ApplicantRepository;
 import com.nagarro.nagptrackingsystem.repositories.BatchRepository;
 import com.nagarro.nagptrackingsystem.repositories.LevelRepository;
 import com.nagarro.nagptrackingsystem.services.ActivityService;
@@ -29,6 +31,9 @@ public class ActivityServiceImp implements ActivityService {
 
 	@Autowired
 	LevelRepository levelRepository;
+
+	@Autowired
+	ApplicantRepository applicantRepository;
 
 	@Override
 	@Transactional
@@ -91,6 +96,8 @@ public class ActivityServiceImp implements ActivityService {
 	@Transactional
 	public Activity editActivity(int id, Activity activity) throws InvalidDataException {
 		Activity editedActivity;
+		System.out.println("\n\n\n\n\n" + activity.getPoints() + "    "
+				+ levelRepository.findById(activity.getLevel().getLevelId()).get().getQualificationPoints());
 		if (activity.getPoints() > levelRepository.findById(activity.getLevel().getLevelId()).get()
 				.getQualificationPoints()) {
 			throw new InvalidDataException(Constants.ACTIVITY_PONTS_INVALID);
@@ -104,6 +111,12 @@ public class ActivityServiceImp implements ActivityService {
 			}
 		}
 		return editedActivity;
+	}
+
+	@Override
+	public List<Activity> getApplicantEligibleActivities(int applicantId) {
+		Applicant applicant = applicantRepository.findById(applicantId).get();
+		return activityRepository.findAllByBatchAndLevel(applicant.getBatch(), applicant.getLevel());
 	}
 
 }

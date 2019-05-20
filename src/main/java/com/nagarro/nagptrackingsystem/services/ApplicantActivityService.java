@@ -23,7 +23,7 @@ public interface ApplicantActivityService {
 			double percentage, User assignor, Date startDate) throws InvalidDataException;
 
 	ApplicantActivity editApplicantActivityByApplicant(int id, ActivityStatus status, String description,
-			byte[] document, User assignor) throws InvalidDataException;
+			byte[] document) throws InvalidDataException;
 
 	double getPointsFromPercentage(double activityPoints, double percentage);
 

@@ -36,7 +36,7 @@ public class Batch {
 	public String description;
 
 	@Temporal(value = TemporalType.DATE)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Column(name = "start_date")
 	public Date startDate;
 

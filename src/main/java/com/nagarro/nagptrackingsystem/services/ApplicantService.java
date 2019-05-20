@@ -17,7 +17,8 @@ import com.nagarro.nagptrackingsystem.exceptions.InvalidDataException;
 
 public interface ApplicantService {
 
-	Applicant addApplicant(Applicant applicant) throws AddressException, MessagingException, IOException;
+	Applicant addApplicant(Applicant applicant)
+			throws AddressException, MessagingException, IOException, InvalidDataException;
 
 	public Applicant editApplicantByApplicant(int id, String password, String name, String contactNo)
 			throws InvalidDataException;

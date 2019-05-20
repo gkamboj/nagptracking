@@ -1,12 +1,13 @@
 package com.nagarro.nagptrackingsystem.servicesimp;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.transaction.Transactional;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -60,8 +61,13 @@ public class ApplicantServiceImp implements ApplicantService {
 
 	@Override
 	// @Transactional
-	public Applicant addApplicant(Applicant applicant) throws AddressException, MessagingException, IOException {
-		if (!(userRepository.findFirstByEmail(applicant.getApplicant().getEmail()) == null)) {
+	public Applicant addApplicant(Applicant applicant) throws MessagingException, IOException, InvalidDataException {
+		if (!(applicant.getApplicant().getContactNo().matches("^[6-9]\\d{9}$"))) {
+			throw new InvalidDataException(Constants.CONTACT_INVALID);
+		} else if (!(Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE)
+				.matcher(applicant.getApplicant().getEmail()).find())) {
+			throw new InvalidDataException(Constants.EMAIL_INVALID);
+		} else if (!(userRepository.findFirstByEmail(applicant.getApplicant().getEmail()) == null)) {
 			throw new DataIntegrityViolationException(Constants.APPLICANT_EMAIL_EXISTS);
 		} else if (!(userRepository.findFirstByContactNo(applicant.getApplicant().getContactNo()) == null)) {
 			throw new DataIntegrityViolationException(Constants.APPLICANT_CONTACT_EXISTS);
@@ -69,6 +75,7 @@ public class ApplicantServiceImp implements ApplicantService {
 			User user = userRepository.save(applicant.getApplicant());
 			applicant.setId(user.getUserId());
 			applicant.setApplicant(user);
+			applicant.setLevel(levelRepository.findFirstByNumber(1));
 			Applicant addedApplicant = applicantRepository.save(applicant);
 			addedApplicant.setBatch(batchRepository.findById(addedApplicant.getBatch().getBatchId()).get());
 			addedApplicant.setLevel(levelRepository.findById(addedApplicant.getLevel().getLevelId()).get());
@@ -176,21 +183,21 @@ public class ApplicantServiceImp implements ApplicantService {
 	public double getAccumulatedPoints(int applicantId) {
 		Applicant applicant = applicantRepository.findById(applicantId).get();
 		List<ApplicantActivity> applicantActivityList = applicantActivityRespository.findByApplicant(applicant);
-		double accumulatedPoints = 0;
+		BigDecimal accumulatedPoints = new BigDecimal(0);
 		for (ApplicantActivity applicantActivity : applicantActivityList) {
 			if (activityRepository.findById(applicantActivity.getActivity().getActivityId()).get().getLevel()
 					.getLevelId() == applicant.getLevel().getLevelId()) {
-				accumulatedPoints += applicantActivity.getPoints();
+				accumulatedPoints = accumulatedPoints.add(BigDecimal.valueOf(applicantActivity.getPoints()));
 			}
 		}
-		return accumulatedPoints;
+		return accumulatedPoints.doubleValue();
 	}
 
 	@Override
 	public double getAccumulatedPointsByMonth(int applicantId, int month) {
 		Applicant applicant = applicantRepository.findById(applicantId).get();
 		List<ApplicantActivity> applicantActivityList = applicantActivityRespository.findByApplicant(applicant);
-		double accumulatedPoints = 0;
+		BigDecimal accumulatedPoints = new BigDecimal(0);
 		for (ApplicantActivity applicantActivity : applicantActivityList) {
 			Calendar completionCal = Calendar.getInstance();
 			if (applicantActivity.getCompletionDate() != null) {
@@ -198,10 +205,10 @@ public class ApplicantServiceImp implements ApplicantService {
 				if (activityRepository.findById(applicantActivity.getActivity().getActivityId()).get().getLevel()
 						.getLevelId() == applicant.getLevel().getLevelId()
 						&& completionCal.get(Calendar.MONTH) == month) {
-					accumulatedPoints += applicantActivity.getPoints();
+					accumulatedPoints = accumulatedPoints.add(BigDecimal.valueOf(applicantActivity.getPoints()));
 				}
 			}
 		}
-		return accumulatedPoints;
+		return accumulatedPoints.doubleValue();
 	}
 }
